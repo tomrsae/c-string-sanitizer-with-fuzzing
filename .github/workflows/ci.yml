@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  fuzz-sanitizer:
+    runs-on: ubuntu-latest
+
+    env:
+      C_COMPILER: "/usr/bin/clang"
+      
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Clang
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: latest
+        platform: x64
+
+    - name: Build tests
+      working-directory: ${{github.workspace}}/tests
+      run: clang -v -g -O1 -fsanitize=fuzzer,address input_sanitizer__fuzz_test.c
+
+    - name: Run tests
+      working-directory: ${{github.workspace}}/tests
+      run: ./a.out -max_total_time=60
