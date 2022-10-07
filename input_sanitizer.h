@@ -4,6 +4,7 @@
 typedef struct MapNode {
     char key;
     char* val;
+    int val_len;
 
     struct MapNode* next;
 } MapNode;
@@ -14,63 +15,58 @@ MapNode* generate_illegal_char_map() {
     MapNode* n1 = malloc(sizeof(MapNode));
 
     n3->key = '&';
-    n3->val = "&amp;\0";
+    n3->val = "&amp;";
     n3->next = NULL;
+    n3->val_len = 5;
 
     n2->key = '<';
-    n2->val = "&lt;\0";
+    n2->val = "&lt;";
     n2->next = n3;
+    n2->val_len = 4;
 
     n1->key = '>';
-    n1->val = "&gt;\0";
+    n1->val = "&gt;";
     n1->next = n2;
+    n1->val_len = 4;
 
     return n1;
 }
 
-char* sanitize(const char* str) {
-    if (str == NULL) return "\0";
-    
-    int len = strlen(str);
-    if (len < 2) return "\0"; 
+char* sanitize(const char* input_str, int size) {
+    char* str = malloc(sizeof(char));
+    *str = '\0';
 
-    char* temp_str = NULL;
+    if (input_str == NULL || size < 2)
+        return str;
+
     MapNode* p_map = generate_illegal_char_map();
 
-    for (int i = 0; i < len; i++) {
-        int realloc_sz = 1;
-        const char* replace_val = NULL;
-        MapNode* p_node = p_map;
+    int curr_len = 1;
+    for (int i = 0; i < size; i++) {
+        const char* concat_str = &input_str[i];
+        int concat_len = 1;
 
-        while (p_node != NULL) {
-            if (str[i] == p_node->key) {
-                replace_val = p_node->val;
-                realloc_sz = strlen(replace_val);
+        for (MapNode *p_node = p_map;
+            p_node != NULL;
+            p_node = p_node->next)
+        {
+            if (input_str[i] == p_node->key) {
+                concat_str = p_node->val;
+                concat_len = p_node->val_len;
                 break;
             }
-
-            p_node = p_node->next;
         }
 
-        int curr_len = 0;
-        if (temp_str != NULL)
-            curr_len = strlen(temp_str);
-
-        int new_len = curr_len + realloc_sz + 1;
-        temp_str = realloc(temp_str, new_len);
-        if (replace_val == NULL) {
-            replace_val = &str[i];
-        }
-        
-        strncat(temp_str, replace_val, realloc_sz);
-        temp_str[new_len] = '\0';
+        str = realloc(str, curr_len + concat_len);
+        strncat(str, concat_str, concat_len);
+        curr_len += concat_len;
     }
 
     while (p_map != NULL) {
-            MapNode* p_temp = p_map;
-            p_map = p_map->next;
-            free(p_temp);
+        MapNode* p_temp = p_map;
+        p_map = p_map->next;
+        free(p_temp);
     }
 
-    return temp_str;
+    return str;
 }

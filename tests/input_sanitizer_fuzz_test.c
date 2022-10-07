@@ -9,7 +9,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     memcpy(buffer, data, size);
     buffer[size] = '\0';
 
-    char* sanitized_string = sanitize(buffer);
+    char* sanitized_string = sanitize(buffer, size + 1);
 
     free(buffer);
     free(sanitized_string);

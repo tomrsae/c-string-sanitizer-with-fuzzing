@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "input_sanitizer.h"
 
 int main(int argc, char** argv) {
@@ -6,7 +7,7 @@ int main(int argc, char** argv) {
 
     printf("String before sanitization: %s\n", str);
 
-    str = sanitize(str);
+    str = sanitize(str, strlen(str));
 
     printf("String after sanitization: %s\n", str);
 
