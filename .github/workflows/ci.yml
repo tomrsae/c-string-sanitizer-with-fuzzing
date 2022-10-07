@@ -23,7 +23,7 @@ jobs:
 
     - name: Build tests
       working-directory: ${{github.workspace}}/tests
-      run: clang -v -g -O1 -fsanitize=fuzzer,address input_sanitizer__fuzz_test.c
+      run: clang -v -g -O1 -fsanitize=fuzzer,address input_sanitizer_fuzz_test.c
 
     - name: Run tests
       working-directory: ${{github.workspace}}/tests
